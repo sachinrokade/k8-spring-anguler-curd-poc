@@ -19,7 +19,7 @@ Ensure these tools are installed and configured on your system before proceeding
 - The backend project (Spring Boot) with a `Dockerfile` and built JAR in `target/`.
 - A `db-deployment.yaml` file for MySQL deployment (refer to the provided content).
 
-## Step-by-Step Deployment Guide
+## Step-by-Step Backend Deployment Guide
 
 ### Step 1: Check Minikube Version
 Verify that Minikube is installed correctly.
@@ -290,6 +290,10 @@ mysql> exit
    - Container: mysql
    - Shell: /bin/sh
 6. Run: `mysql -u root -p` inside the terminal.
+
+## Step-by-Step Angular Deployment Guide
+🚧 In Progress 🚧
+The Angular frontend deployment guide is currently under development. Stay tuned for updates!
 
 ## Notes
 - The backend service is accessible via the URL provided by `minikube service backend-deployment --url`.
