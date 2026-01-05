@@ -1,4 +1,4 @@
-# Angular-SpringBoot CRUD Example - Backend Deployment on Kubernetes
+# Building a CRUD Application with Angular, Spring Boot, and Kubernetes (Dockerized)
 
 This README provides a step-by-step guide to deploying the backend (Spring Boot application) and MySQL database on a local Kubernetes cluster using Minikube. The guide includes console outputs for verification and troubleshooting.
 
@@ -25,7 +25,7 @@ Ensure these tools are installed and configured on your system before proceeding
 Verify that Minikube is installed correctly.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>minikube version
+D:\angular-springboot-crud-example-main\backend>minikube version
 minikube version: v1.37.0
 commit: 65318f4cfff9c12cc87ec9eb8f4cdd57b25047f3
 ```
@@ -34,7 +34,7 @@ commit: 65318f4cfff9c12cc87ec9eb8f4cdd57b25047f3
 Start the Minikube cluster using the Docker driver.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>minikube start --driver=docker
+D:\angular-springboot-crud-example-main\backend>minikube start --driver=docker
 
 * minikube v1.37.0 on Microsoft Windows 11 Home Single Language 10.0.26200.7171 Build 26200.7171
 * Using the docker driver based on existing profile
@@ -54,7 +54,7 @@ D:\Studay\angular-springboot-crud-example-main\backend>minikube start --driver=d
 Check the status of the Minikube cluster.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>minikube status
+D:\angular-springboot-crud-example-main\backend>minikube status
 minikube
 type: Control Plane
 host: Running
@@ -67,7 +67,7 @@ kubeconfig: Configured
 Verify the Kubernetes control plane and services.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>kubectl cluster-info
+D:\angular-springboot-crud-example-main\backend>kubectl cluster-info
 Kubernetes control plane is running at https://127.0.0.1:53404
 CoreDNS is running at https://127.0.0.1:53404/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 
@@ -78,7 +78,7 @@ To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 Ensure the node is ready.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>kubectl get node
+D:\angular-springboot-crud-example-main\backend>kubectl get node
 NAME       STATUS   ROLES           AGE   VERSION
 minikube   Ready    control-plane   62m   v1.34.0
 ```
@@ -87,7 +87,7 @@ minikube   Ready    control-plane   62m   v1.34.0
 Set up Docker to use Minikube's daemon.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>minikube docker-env
+D:\angular-springboot-crud-example-main\backend>minikube docker-env
 SET DOCKER_TLS_VERIFY=1
 SET DOCKER_HOST=tcp://127.0.0.1:53405
 SET DOCKER_CERT_PATH=C:\Users\mrsac\.minikube\certs
@@ -102,7 +102,7 @@ Apply the environment variables (run the REM command if needed).
 Check existing images in Minikube's Docker daemon.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>docker images
+D:\angular-springboot-crud-example-main\backend>docker images
                                                                                                                                                       i Info →   U  In Use
 IMAGE                                 ID             DISK USAGE   CONTENT SIZE   EXTRA
 gcr.io/k8s-minikube/kicbase:v0.0.48   c6b5532e987b       1.31GB             0B    U
@@ -112,7 +112,7 @@ gcr.io/k8s-minikube/kicbase:v0.0.48   c6b5532e987b       1.31GB             0B  
 Build the Docker image for the Spring Boot backend.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>docker build -t backend:01 .
+D:\angular-springboot-crud-example-main\backend>docker build -t backend:01 .
 [+] Building 10.5s (8/8) FINISHED                                                                                                                    docker:desktop-linux
  => [internal] load build definition from Dockerfile                                                                                                                 0.4s
  => => transferring dockerfile: 181B                                                                                                                                 0.3s
@@ -140,7 +140,7 @@ What's next:
 List images to confirm the backend image is built.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>docker images
+D:\angular-springboot-crud-example-main\backend>docker images
                                                                                                                                                       i Info →   U  In Use
 IMAGE                                 ID             DISK USAGE   CONTENT SIZE   EXTRA
 backend:01                            602fc835a888        466MB             0B
@@ -151,22 +151,23 @@ gcr.io/k8s-minikube/kicbase:v0.0.48   c6b5532e987b       1.31GB             0B  
 Load the built image into Minikube's cache.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>minikube image load backend:01
+D:\angular-springboot-crud-example-main\backend>minikube image load backend:01
 ```
 
 ### Step 11: Create Backend Deployment
 Deploy the backend application.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>kubectl create deployment backend-deployment --image=backend:01 --port=8080
+D:\angular-springboot-crud-example-main\backend>kubectl create deployment backend-deployment --image=backend:01 --port=8080
 deployment.apps/backend-deployment created
 ```
+ ### NOTE : While the deployment object can be created using command-line commands, a dedicated app-deployment.yml file is required to configure and enable proper communication between the Spring Boot application and MySQL.
 
 ### Step 12: Check Deployment Status
 Verify the deployment.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>kubectl get deployment
+D:\angular-springboot-crud-example-main\backend>kubectl get deployment
 NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
 backend-deployment   1/1     1            1           9s
 ```
@@ -175,7 +176,7 @@ backend-deployment   1/1     1            1           9s
 Ensure the pod is running.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>kubectl get pod
+D:\angular-springboot-crud-example-main\backend>kubectl get pod
 NAME                                 READY   STATUS             RESTARTS   AGE
 backend-deployment-5cff586dd-4bt46   1/1     Running            0          19s
 ```
@@ -184,7 +185,7 @@ backend-deployment-5cff586dd-4bt46   1/1     Running            0          19s
 Expose the backend service as a NodePort.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>kubectl expose deployment backend-deployment --type=NodePort
+D:\angular-springboot-crud-example-main\backend>kubectl expose deployment backend-deployment --type=NodePort
 service/backend-deployment exposed
 ```
 
@@ -192,7 +193,7 @@ service/backend-deployment exposed
 Verify the service is created.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>kubectl get service
+D:\angular-springboot-crud-example-main\backend>kubectl get service
 NAME                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
 backend-deployment   NodePort    10.109.157.147   <none>        8080:31516/TCP   25s
 kubernetes           ClusterIP   10.96.0.1        <none>        443/TCP          77m
@@ -202,7 +203,7 @@ kubernetes           ClusterIP   10.96.0.1        <none>        443/TCP         
 Obtain the URL to access the backend service.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>minikube service backend-deployment --url
+D:\angular-springboot-crud-example-main\backend>minikube service backend-deployment --url
 http://127.0.0.1:50764
 ! Because you are using a Docker driver on windows, the terminal needs to be open to run it.
 ```
@@ -211,7 +212,7 @@ http://127.0.0.1:50764
 Open the Kubernetes dashboard for monitoring.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>minikube dashboard
+D:\angular-springboot-crud-example-main\backend>minikube dashboard
 * Enabling dashboard ...
   - Using image docker.io/kubernetesui/dashboard:v2.7.0
   - Using image docker.io/kubernetesui/metrics-scraper:v1.0.8
@@ -232,7 +233,7 @@ D:\Studay\angular-springboot-crud-example-main\backend>minikube dashboard
 Apply the MySQL deployment YAML file.
 
 ```
-D:\Studay\angular-springboot-crud-example-main\backend>kubectl apply -f .\db-deployment.yaml
+D:\angular-springboot-crud-example-main\backend>kubectl apply -f .\db-deployment.yaml
 persistentvolumeclaim/mysql-pv-claim unchanged
 deployment.apps/mysql unchanged
 service/mysql unchanged
@@ -242,7 +243,7 @@ service/mysql unchanged
 Verify both backend and MySQL pods are running.
 
 ```
-PS D:\Studay\angular-springboot-crud-example-main\backend> kubectl get pod
+PS D:\angular-springboot-crud-example-main\backend> kubectl get pod
 NAME                                    READY   STATUS    RESTARTS      AGE
 backend-deployment-5cff586dd-66ckj      1/1     Running   1 (12d ago)   14d
 mysql-5bdfd74f8d-nnd7p                  1/1     Running   0             6m52s
@@ -252,7 +253,7 @@ mysql-5bdfd74f8d-nnd7p                  1/1     Running   0             6m52s
 Connect to the MySQL pod and interact with the database.
 
 ```
-PS D:\Studay\angular-springboot-crud-example-main\backend> kubectl exec -it mysql-5bdfd74f8d-nnd7p -- mysql -u root -p
+PS D:\angular-springboot-crud-example-main\backend> kubectl exec -it mysql-5bdfd74f8d-nnd7p -- mysql -u root -p
 Enter password:
 Welcome to the MySQL monitor.  Commands end with ; or \g.
 Your MySQL connection id is 2
