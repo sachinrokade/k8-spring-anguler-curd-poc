@@ -1,4 +1,4 @@
-# Building a CRUD Application with Angular, Spring Boot, and Kubernetes (Dockerized)
+# Building a CRUD Application with Angular, Spring Boot, and Kubernetes (GitHub Codespace)
 
 This README provides a step-by-step guide to deploying the backend (Spring Boot application) and MySQL database on a local Kubernetes cluster using Minikube. The guide includes console outputs for verification and troubleshooting.
 
@@ -154,14 +154,21 @@ Load the built image into Minikube's cache. [this step only need when image is n
 ```
 
 ### Step 11: Create Backend Deployment
-Deploy the backend application.
 
+Deploy the backend application to your Kubernetes cluster.
+
+You can create a deployment directly using kubectl:
 ```
-@sachinrokade ➜ /workspaces/k8-spring-anguler-curd-poc/backend (main) $ kubectl create deployment backend-deployment --image=backend:01 --port=8080
+@sachinrokade ➜ /workspaces/k8-spring-angular-crud-poc/backend (main) $ kubectl create deployment backend-deployment --image=backend:01 --port=8080
 deployment.apps/backend-deployment created
 ```
- ### NOTE : Apply Deployment for that need to create delployment.yml [springboot-mysql-deployment.yml] file and then run this command 
- kubectl apply -f springboot-mysql-deployment.yml
+
+Note: It is recommended to define your deployment in a YAML file for better maintainability. For this project, create a deployment file named springboot-mysql-deployment.yml and apply it using:
+```
+kubectl apply -f springboot-mysql-deployment.yml
+```
+
+This approach ensures your deployment configuration is version-controlled and easily reusable.
 
  
 
@@ -169,10 +176,12 @@ deployment.apps/backend-deployment created
 Verify the deployment.
 
 ```
-@sachinrokade ➜ /workspaces/k8-spring-anguler-curd-poc/backend (main) $ kubectl get deployment
-NAME              READY   UP-TO-DATE   AVAILABLE   AGE
-mysql             1/1     1            1           12s
-springboot-crud   0/3     3            0           11s
+@sachinrokade ➜ /workspaces/k8-spring-anguler-curd-poc/backend (main) $ kubectl get services
+NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+kubernetes            ClusterIP   10.96.0.1       <none>        443/TCP          73m
+mysql                 ClusterIP   None            <none>        3306/TCP         71m
+springboot-crud-svc   NodePort    10.104.40.101   <none>        8080:32223/TCP   72m
+springboot-service    NodePort    10.99.120.98    <none>        8080:30080/TCP   63m
 
 ```
 
@@ -196,15 +205,8 @@ springboot-crud-b6cf9fbf4-jh4h4   1/1     Running   0          40s
 
 ```
 
-### Step 14: Expose the Deployment
-Expose the backend service as a NodePort.
 
-```
-@sachinrokade ➜ /workspaces/k8-spring-anguler-curd-poc/backend (main) $ kubectl expose deployment springboot-crud --type=NodePort
-service/springboot-crud exposed
-```
-
-### Step 15: Check Services
+### Step 14: Check Services
 Verify the service is created.
 
 ```
@@ -217,17 +219,9 @@ springboot-service    NodePort    10.99.120.98    <none>        8080:30080/TCP  
 ```
 
 
-
-### Step 16: Get Service URL
+### Step 15: Get Service URL  [Get service url form github codespace]
 Obtain the URL to access the backend service.
 
-```
-@sachinrokade ➜ /workspaces/k8-spring-anguler-curd-poc/backend (main) $ minikube service springboot-crud-svc --url
-http://127.0.0.1:50764
-! Because you are using a Docker driver on windows, the terminal needs to be open to run it.
-```
-
-### Step 16.1 : Get service url form github codespace
 ```
 @sachinrokade ➜ /workspaces/k8-spring-anguler-curd-poc/backend (main) $ kubectl port-forward service/springboot-service 8080:8080
 Forwarding from 127.0.0.1:8080 -> 8080
@@ -236,7 +230,7 @@ Handling connection for 8080
 Handling connection for 8080
 ```
 
-### Step 17: Access Minikube Dashboard (Optional)
+### Step 16: Access Minikube Dashboard (Optional)
 Open the Kubernetes dashboard for monitoring.
 
 ```
@@ -257,15 +251,22 @@ Open the Kubernetes dashboard for monitoring.
 
 ## MySQL Database Deployment
 
-
-### Step 20: Access MySQL via kubectl exec
+###  Access MySQL via kubectl exec
 Connect to the MySQL pod and interact with the database.
 
 ```
-PS @sachinrokade ➜ /workspaces/k8-spring-anguler-curd-poc/backend (main) $  kubectl exec -it mysql-5bdfd74f8d-nnd7p -- mysql -u root -p
-Enter password:
+@sachinrokade ➜ /workspaces/k8-spring-anguler-curd-poc/backend (main) $ kubectl get pods
+NAME                              READY   STATUS    RESTARTS   AGE
+mysql-64f6596d97-fbqfc            1/1     Running   0          48m
+springboot-crud-b6cf9fbf4-4tpxr   1/1     Running   0          48m
+springboot-crud-b6cf9fbf4-9tlx4   1/1     Running   0          48m
+springboot-crud-b6cf9fbf4-jh4h4   1/1     Running   0          48m
+@sachinrokade ➜ /workspaces/k8-spring-anguler-curd-poc/backend (main) $  kubectl exec -it mysql-64f6596d97-fbqfc 
+error: you must specify at least one command for the container
+@sachinrokade ➜ /workspaces/k8-spring-anguler-curd-poc/backend (main) $ kubectl exec -it mysql-64f6596d97-fbqfc  -- mysql -u root -p
+Enter password: 
 Welcome to the MySQL monitor.  Commands end with ; or \g.
-Your MySQL connection id is 2
+Your MySQL connection id is 62
 Server version: 5.7.44 MySQL Community Server (GPL)
 
 Copyright (c) 2000, 2023, Oracle and/or its affiliates.
@@ -286,7 +287,7 @@ mysql> SHOW DATABASES;
 | performance_schema |
 | sys                |
 +--------------------+
-5 rows in set (0.03 sec)
+5 rows in set (0.01 sec)
 
 mysql> exit
 ```
